@@ -340,7 +340,7 @@
         <div class="user-avatar">MS</div>
       </div>
     </header>
-<!-- Dashboard Stats -->
+
     <!-- Dashboard Stats -->
     <div class="dashboard-grid">
       <div class="card">
@@ -389,12 +389,62 @@
     </div>
 
     <!-- Map -->
-    <div class="map-container">
-      <div class="map-placeholder">
-        <i class="fas fa-map-marked-alt"></i>
-        <span>Mapa de seguimiento en tiempo real</span>
-      </div>
-    </div>
+   <!-- Mapa de seguimiento -->
+<div id="map" class="map-container"></div>
+
+<!-- Leaflet CDN (debe ir al final del body o en el head) -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard cargado');
+
+    // Mapa Leaflet
+    const map = L.map('map').setView([-12.0464, -77.0428], 13); // Lima por defecto
+
+    // Capa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Geolocalización
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          if (!window.miUbicacion) {
+            window.miUbicacion = L.marker([latitude, longitude])
+              .addTo(map)
+              .bindPopup('📍 Tu ubicación actual')
+              .openPopup();
+          } else {
+            window.miUbicacion.setLatLng([latitude, longitude]);
+          }
+
+          map.setView([latitude, longitude], 15);
+        },
+        (err) => {
+          alert('No se pudo obtener la ubicación: ' + err.message);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      alert('Geolocalización no soportada en este navegador.');
+    }
+
+    // Actualización de vehículos activos falsa
+    setInterval(() => {
+      const activeVehicles = Math.floor(Math.random() * 5) + 22;
+      document.querySelector('.dashboard-grid .card:nth-child(1) .card-value').textContent = activeVehicles;
+    }, 5000);
+  });
+</script>
+
 
     <!-- Recent Activity -->
     <div class="card">
@@ -440,7 +490,7 @@
   </main>
 
   <script>
-    // Simulación de datos para el dashboard
+    // Simulación de datos para el dashboard mauricio-ALCIDES
     document.addEventListener('DOMContentLoaded', function() {
       // Aquí iría la lógica para cargar datos reales desde tu API
       console.log('Dashboard cargado');
